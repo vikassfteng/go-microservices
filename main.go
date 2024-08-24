@@ -38,19 +38,19 @@ import (
 // 	http.ListenAndServe(":80", nil)
 // }
 
-func heatlhHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("checking application health")
-	reponse := map[string]string{
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("Checking application health")
+	response := map[string]string{
 		"status":    "UP",
 		"timestamp": time.Now().String(),
 	}
-	json.NewEncoder(w).Encode(reponse)
+	json.NewEncoder(w).Encode(response)
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Serving the homepage")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Applicaiton is rnnning")
+	fmt.Fprintf(w, "Application is up and running")
 }
 
 func detailsHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,22 +59,23 @@ func detailsHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	IP, _ := details.GetIp()
+	IP, _ := details.GetIP()
 	fmt.Println(hostname, IP)
-	reponse := map[string]string{
-		"Hostname": hostname,
-		"IP":       IP.String(),
+	response := map[string]string{
+		"hostname": hostname,
+		"ip":       IP.String(),
 	}
-	json.NewEncoder(w).Encode(reponse)
+	json.NewEncoder(w).Encode(response)
 
 }
 
 func main() {
-
 	r := mux.NewRouter()
-	r.HandleFunc("/health", heatlhHandler)
+	log.Println("Starting the application...")
+	r.HandleFunc("/health", healthHandler)
+	log.Println("Registering the handlers...")
 	r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/details", detailsHandler)
-
+	log.Println("Server has started!!!")
 	log.Fatal(http.ListenAndServe(":80", r))
 }
